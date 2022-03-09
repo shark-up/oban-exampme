@@ -7,23 +7,31 @@ defmodule JobsProcessor.HookWorker do
     max_attempts: 5,
     tags: ["hook"]
 
-  @delay 3 * 1000
+  @min 60
 
-  @impl Oban.Worker
-  def perform(args) do
+  @delay [0, 5 * @min, 10 * @min, 20 * @min, 60 * @min, 120 * @min]
+
+  @impl Worker
+  def perform(_args) do
     Logger.warn("start to perform")
 
-    IO.inspect(args: args)
     performing()
 
     Logger.warn("done")
 
     # If returns :ok, then the job is done for Oban
     # elise if {:error, ...} then retry in n time (4 strategies for the backoff)
-    Enum.random([:ok, {:error, "An error ..."}])
+    # Enum.random([:ok, {:error, "An error ..."}])
+    {:error, "test"}
   end
 
-  def performing do
-    :timer.sleep(@delay)
+  @impl Worker
+  def backoff(%Job{attempt: attempt}) do
+    Logger.warn("n°#{attempt} : #{Enum.at(@delay, attempt, 360 * @min)}")
+    Enum.at(@delay, attempt, 360 * @min)
+  end
+
+  defp performing do
+    :timer.sleep( 3 * 1000)
   end
 end
