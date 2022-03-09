@@ -21,8 +21,7 @@ defmodule JobsProcessor.HookWorker do
 
     # If returns :ok, then the job is done for Oban
     # elise if {:error, ...} then retry in n time (4 strategies for the backoff)
-    # Enum.random([:ok, {:error, "An error ..."}])
-    {:error, "test"}
+    Enum.random([:ok, {:error, "An error ..."}])
   end
 
   @impl Worker
